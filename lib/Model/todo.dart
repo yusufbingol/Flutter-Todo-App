@@ -1,10 +1,10 @@
-class Todos {
+class Todo {
   int userId;
   int id;
   String title;
   bool completed;
 
-  Todos.fromJson(Map json)
+  Todo.fromJson(Map json)
       : userId = json['userId'],
         id = json['id'],
         title = json['title'],

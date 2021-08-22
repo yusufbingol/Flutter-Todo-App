@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:todo_app/pages/add_todo.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -14,6 +15,7 @@ class _MyHomePageState extends State<MyHomePage> {
     {'title': 'Deneme title 1', 'desc': 'description deneme 1'},
     {'title': 'Deneme title 2', 'desc': 'description deneme 2'},
   ]; */
+  Map selectedItems = {};
   List todoList = [];
 
   void getTodosfromApi() async {
@@ -39,11 +41,14 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).primaryColor,
       ),
       floatingActionButton: FloatingActionButton(
-          backgroundColor: Theme.of(context).primaryColor,
-          child: Icon(Icons.add),
-          onPressed: () {
-            //print('Ekle');
-          }),
+          backgroundColor: selectedItems.length > 0
+              ? Colors.red[400]
+              : Theme.of(context).primaryColor,
+          child: Icon(
+            selectedItems.length > 0 ? Icons.delete : Icons.add,
+          ),
+          onPressed: () => Navigator.push(
+              context, MaterialPageRoute(builder: (_) => AddTodo()))),
       body: Container(
         child: Column(
           children: <Widget>[
@@ -57,10 +62,23 @@ class _MyHomePageState extends State<MyHomePage> {
                   isThreeLine: true,
                   subtitle:
                       Text(item['completed'] ? 'Tamamlandı' : 'Tamamlanmadı!'),
-                  leading: Icon(item['completed'] ? Icons.done : Icons.update),
+                  leading: Icon(
+                    item['completed'] ? Icons.done : Icons.update,
+                    color: item['completed'] ? Colors.green : Colors.amber,
+                  ),
                   trailing: Checkbox(
-                    value: false,
-                    onChanged: (value) {},
+                    value: selectedItems[index] == null
+                        ? false
+                        : selectedItems[index],
+                    onChanged: (value) {
+                      setState(() {
+                        if (selectedItems[index] == null) {
+                          selectedItems[index] = true;
+                        } else {
+                          selectedItems.remove(index);
+                        }
+                      });
+                    },
                   ),
                 );
               },

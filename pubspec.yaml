@@ -1,5 +1,5 @@
 name: todo_app
-description: A new Flutter project.
+description: Todo App.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -29,6 +29,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   http: ^0.13.3
+  google_fonts: ^2.1.0
+  intl: ^0.17.0
+
 
 dev_dependencies:
   flutter_test:
