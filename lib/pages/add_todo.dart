@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:todo_app/Helpers/database_helper.dart';
+import 'package:todo_app/Model/todo_model.dart';
+import 'package:todo_app/pages/homepage.dart';
 
 class AddTodo extends StatefulWidget {
   @override
@@ -33,6 +36,13 @@ class _AddTodoState extends State<AddTodo> {
     }
   }
 
+  Future sendForm() async {
+    Todo todo = Todo(
+        title: _title, date: _date.toString(), priority: _priority, status: 0);
+    DatabaseHelper instance = DatabaseHelper.instance;
+    return await instance.insertTodo(todo);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -47,7 +57,11 @@ class _AddTodoState extends State<AddTodo> {
         leading: Transform.translate(
           offset: Offset(25, 10),
           child: IconButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyHomePage(),
+                )),
             icon: Icon(
               Icons.arrow_back_ios,
               size: 30.0,
@@ -184,7 +198,12 @@ class _AddTodoState extends State<AddTodo> {
                         padding:
                             EdgeInsets.symmetric(horizontal: 0, vertical: 15.0),
                         child: MaterialButton(
-                          onPressed: () => null,
+                          onPressed: () =>
+                              sendForm().then((value) => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MyHomePage(),
+                                  ))),
                           minWidth: double.infinity,
                           height: 55.0,
                           color: Colors.red,

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:todo_app/pages/add_todo.dart';
+import 'package:todo_app/Helpers/database_helper.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -17,6 +18,7 @@ class _MyHomePageState extends State<MyHomePage> {
   ]; */
   Map selectedItems = {};
   List todoList = [];
+  bool isLoading = true;
 
   void getTodosfromApi() async {
     http
@@ -24,6 +26,17 @@ class _MyHomePageState extends State<MyHomePage> {
         .then((value) {
       setState(() {
         todoList = json.decode(value.body);
+        isLoading = false;
+      });
+    });
+  }
+
+  void getTodosfromDb() async {
+    DatabaseHelper instance = DatabaseHelper.instance;
+    await instance.getTodoMapList().then((value) {
+      setState(() {
+        todoList = value;
+        isLoading = false;
       });
     });
   }
@@ -31,7 +44,8 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    getTodosfromApi();
+    //getTodosfromApi();
+    getTodosfromDb();
   }
 
   Widget build(BuildContext context) {
@@ -53,36 +67,44 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           children: <Widget>[
             Flexible(
-                child: ListView.builder(
-              itemCount: todoList.length,
-              itemBuilder: (context, index) {
-                Map item = todoList[index];
-                return new ListTile(
-                  title: Text(item['title']),
-                  isThreeLine: true,
-                  subtitle:
-                      Text(item['completed'] ? 'Tamamlandı' : 'Tamamlanmadı!'),
-                  leading: Icon(
-                    item['completed'] ? Icons.done : Icons.update,
-                    color: item['completed'] ? Colors.green : Colors.amber,
-                  ),
-                  trailing: Checkbox(
-                    value: selectedItems[index] == null
-                        ? false
-                        : selectedItems[index],
-                    onChanged: (value) {
-                      setState(() {
-                        if (selectedItems[index] == null) {
-                          selectedItems[index] = true;
-                        } else {
-                          selectedItems.remove(index);
-                        }
-                      });
-                    },
-                  ),
-                );
-              },
-            ))
+              child: !isLoading
+                  ? ListView.builder(
+                      itemCount: todoList.length,
+                      itemBuilder: (context, index) {
+                        Map item = todoList[index];
+                        return new ListTile(
+                          title: Text(item['title']),
+                          isThreeLine: true,
+                          subtitle: Text(item['date'].toString().split(' ')[0] +
+                              "-" +
+                              item['priority']),
+                          leading: Icon(
+                            item['status'] == 1 ? Icons.done : Icons.update,
+                            color: item['status'] == 1
+                                ? Colors.green
+                                : Colors.amber,
+                          ),
+                          trailing: Checkbox(
+                            value: selectedItems[index] == null
+                                ? false
+                                : selectedItems[index],
+                            onChanged: (value) {
+                              setState(() {
+                                if (selectedItems[index] == null) {
+                                  selectedItems[index] = true;
+                                } else {
+                                  selectedItems.remove(index);
+                                }
+                              });
+                            },
+                          ),
+                        );
+                      },
+                    )
+                  : Center(
+                      child: CircularProgressIndicator(),
+                    ),
+            ),
           ],
         ),
       ),
