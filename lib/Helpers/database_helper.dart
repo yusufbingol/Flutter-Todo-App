@@ -72,10 +72,10 @@ class DatabaseHelper {
     return result;
   }
 
-  Future deleteTodo(int id) async {
+  Future deleteTodo(List<int> ids) async {
     Database db = await this.db;
-    final int result =
-        await db.delete(todoTable, where: '$colId = ?', whereArgs: [id]);
+    final int result = await db.delete(todoTable,
+        where: '$colId IN (${ids.join(', ').toString()})');
     return result;
   }
 }

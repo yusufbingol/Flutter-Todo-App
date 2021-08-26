@@ -5,17 +5,24 @@ import 'package:todo_app/Helpers/database_helper.dart';
 import 'package:todo_app/Model/todo_model.dart';
 import 'package:todo_app/pages/homepage.dart';
 
-class AddTodo extends StatefulWidget {
+class EditTodo extends StatefulWidget {
+  final Map todoItem;
+
+  EditTodo(this.todoItem);
+
   @override
   _AddTodoState createState() => _AddTodoState();
 }
 
-class _AddTodoState extends State<AddTodo> {
+class _AddTodoState extends State<EditTodo> {
   final _formKey = GlobalKey<FormState>();
+  int todoId = 0;
   String _title = '';
   String _priority = '';
+  String selectedPriority = 'Low';
   DateTime _date = DateTime.now();
   TextEditingController _dateController = TextEditingController();
+  TextEditingController titleController = TextEditingController();
 
   final DateFormat _dateFormat = DateFormat('dd MMM, yyy');
   final List<String> _priorities = ['Low', 'Medium', 'High'];
@@ -37,16 +44,29 @@ class _AddTodoState extends State<AddTodo> {
   }
 
   Future sendForm() async {
-    Todo todo = Todo(
-        title: _title, date: _date.toString(), priority: _priority, status: 0);
+    Todo todo = Todo.withId(
+        id: todoId,
+        title: _title,
+        date: _date.toString(),
+        priority: _priority,
+        status: 0);
     DatabaseHelper instance = DatabaseHelper.instance;
-    return await instance.insertTodo(todo);
+    return await instance.updateTodo(todo);
   }
 
   @override
   void initState() {
     super.initState();
-    _dateController.text = _dateFormat.format(_date);
+    _dateController.text =
+        _dateFormat.format(DateTime.parse(widget.todoItem['date']));
+    titleController.text = widget.todoItem['title'];
+    setState(() {
+      todoId = widget.todoItem['id'];
+      selectedPriority = widget.todoItem['priority'];
+      _priority = widget.todoItem['priority'];
+      _title = widget.todoItem['title'];
+      _date = DateTime.parse(widget.todoItem['date']);
+    });
   }
 
   Widget build(BuildContext context) {
@@ -79,7 +99,7 @@ class _AddTodoState extends State<AddTodo> {
             child: Column(
               children: [
                 Text(
-                  'Add Todo',
+                  'Edit Todo',
                   textAlign: TextAlign.left,
                   style: GoogleFonts.ubuntu(
                     fontWeight: FontWeight.bold,
@@ -95,6 +115,7 @@ class _AddTodoState extends State<AddTodo> {
                         padding:
                             EdgeInsets.symmetric(horizontal: 0, vertical: 15.0),
                         child: TextFormField(
+                          controller: titleController,
                           style: TextStyle(
                             fontSize: 20.0,
                             color: Colors.white,
@@ -156,6 +177,7 @@ class _AddTodoState extends State<AddTodo> {
                             color: Colors.white,
                           ),
                           dropdownColor: Colors.black,
+                          value: selectedPriority,
                           items: _priorities.map((String priority) {
                             return DropdownMenuItem(
                               value: priority,
@@ -212,7 +234,7 @@ class _AddTodoState extends State<AddTodo> {
                               borderRadius: BorderRadius.circular(20.0)),
                           splashColor: Colors.indigo,
                           child: Text(
-                            'Add',
+                            'Update',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 18.0,

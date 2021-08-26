@@ -19,6 +19,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.deepPurpleAccent,
       ),
       home: MyHomePage(),
+      routes: {'home': (context) => MyHomePage()},
     );
   }
 }
