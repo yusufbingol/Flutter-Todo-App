@@ -167,7 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     badgeColor: (() {
                                       switch (item['priority']) {
                                         case 'Medium':
-                                          return Colors.deepOrange;
+                                          return Colors.indigoAccent;
                                         case 'High':
                                           return Colors.red;
 
