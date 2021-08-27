@@ -90,7 +90,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    //getTodosfromApi();
     getTodosfromDb();
   }
 
@@ -147,7 +146,17 @@ class _MyHomePageState extends State<MyHomePage> {
                                     animationDuration:
                                         Duration(milliseconds: 650),
                                     badgeContent: Text(
-                                      item['date'].toString().split(' ')[0],
+                                      item['date'].toString().split(' ')[0] +
+                                          " " +
+                                          item['date']
+                                              .toString()
+                                              .split(' ')[1]
+                                              .split(":")[0] +
+                                          ":" +
+                                          item['date']
+                                              .toString()
+                                              .split(' ')[1]
+                                              .split(":")[1],
                                       style: TextStyle(color: Colors.white),
                                     ),
                                     badgeColor: Theme.of(context).primaryColor,
@@ -156,27 +165,29 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                               Padding(
                                 padding: EdgeInsets.only(top: 0),
-                                child: Badge(
-                                    animationType: BadgeAnimationType.slide,
-                                    animationDuration:
-                                        Duration(milliseconds: 650),
-                                    badgeContent: Text(
-                                      item['priority'],
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    badgeColor: (() {
-                                      switch (item['priority']) {
-                                        case 'Medium':
-                                          return Colors.indigoAccent;
-                                        case 'High':
-                                          return Colors.red;
+                                child: item['priority'].isEmpty
+                                    ? null
+                                    : Badge(
+                                        animationType: BadgeAnimationType.slide,
+                                        animationDuration:
+                                            Duration(milliseconds: 650),
+                                        badgeContent: Text(
+                                          item['priority'],
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        badgeColor: (() {
+                                          switch (item['priority']) {
+                                            case 'Medium':
+                                              return Colors.indigoAccent;
+                                            case 'High':
+                                              return Colors.red;
 
-                                        default:
-                                          return Colors.green;
-                                      }
-                                    }()),
-                                    shape: BadgeShape.square,
-                                    borderRadius: BorderRadius.circular(8)),
+                                            default:
+                                              return Colors.green;
+                                          }
+                                        }()),
+                                        shape: BadgeShape.square,
+                                        borderRadius: BorderRadius.circular(8)),
                               )
                             ],
                           ),

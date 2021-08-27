@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:todo_app/Helpers/database_helper.dart';
 import 'package:todo_app/Model/todo_model.dart';
 import 'package:todo_app/pages/homepage.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 
 class EditTodo extends StatefulWidget {
   final Map todoItem;
@@ -21,10 +22,11 @@ class _AddTodoState extends State<EditTodo> {
   String _priority = '';
   String selectedPriority = 'Low';
   DateTime _date = DateTime.now();
+  TimeOfDay _time = TimeOfDay.now();
   TextEditingController _dateController = TextEditingController();
   TextEditingController titleController = TextEditingController();
 
-  final DateFormat _dateFormat = DateFormat('dd MMM, yyy');
+  final DateFormat _dateFormat = DateFormat('dd MMM, yyy').add_Hm();
   final List<String> _priorities = ['Low', 'Medium', 'High'];
 
   _handleDatePicker() async {
@@ -40,6 +42,22 @@ class _AddTodoState extends State<EditTodo> {
         _date = date;
       });
       _dateController.text = _dateFormat.format(date);
+      _handleTimePicker();
+    }
+  }
+
+  _handleTimePicker() async {
+    final time = await showTimePicker(context: context, initialTime: _time);
+    if (time != null && time != _time) {
+      setState(() {
+        _time = time;
+      });
+      DateTime ndt = DateTime.utc(
+          _date.year, _date.month, _date.day, _time.hour, _time.minute, 00);
+      _dateController.text = _dateFormat.format(ndt);
+      setState(() {
+        _date = ndt;
+      });
     }
   }
 
@@ -51,7 +69,16 @@ class _AddTodoState extends State<EditTodo> {
         priority: _priority,
         status: 0);
     DatabaseHelper instance = DatabaseHelper.instance;
-    return await instance.updateTodo(todo);
+    return await instance.updateTodo(todo).then((value) {
+      String sheduleDate =
+          DateTime.parse(_date.toString()).toString().split(" ")[0].toString();
+      String sheduleTime = DateTime.parse(_date.toString())
+          .toString()
+          .split(" ")[1]
+          .split(".")[0]
+          .toString();
+      notify(todoId, sheduleDate + " " + sheduleTime, _title);
+    });
   }
 
   @override
@@ -67,6 +94,16 @@ class _AddTodoState extends State<EditTodo> {
       _title = widget.todoItem['title'];
       _date = DateTime.parse(widget.todoItem['date']);
     });
+  }
+
+  void notify(int id, String date, String title) async {
+    AwesomeNotifications().createNotification(
+        content: NotificationContent(
+            id: id,
+            channelKey: 'basic_channel',
+            title: 'Reminding',
+            body: title),
+        schedule: NotificationCalendar.fromDate(date: DateTime.parse(date)));
   }
 
   Widget build(BuildContext context) {
