@@ -9,7 +9,7 @@ void main() {
     NotificationChannel(
         channelKey: 'basic_channel',
         channelName: 'Basic notifications',
-        channelDescription: 'Notification channel for basic tests',
+        channelDescription: 'Basic Notification',
         defaultColor: Color(0xFF9D50DD),
         playSound: true,
         enableLights: true,
