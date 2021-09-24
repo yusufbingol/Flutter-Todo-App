@@ -98,7 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // Widget tipinde bir metot
     if (todoList.length == 0) {
       return new Container(
-        width: 400,
+        constraints: BoxConstraints(minWidth: 100, maxWidth: 400),
         height: 400,
         margin: const EdgeInsets.only(top: 50.0),
         decoration: BoxDecoration(
