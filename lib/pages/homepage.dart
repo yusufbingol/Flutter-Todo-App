@@ -19,7 +19,6 @@ class _MyHomePageState extends State<MyHomePage> {
   List todoList = [];
   bool isLoading = true;
   DatabaseHelper instance = DatabaseHelper.instance;
-  String yazi = '';
   void getTodosfromApi() async {
     http
         .get(Uri.parse("https://jsonplaceholder.typicode.com/todos"))
