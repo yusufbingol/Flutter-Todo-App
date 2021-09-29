@@ -93,12 +93,43 @@ class _MyHomePageState extends State<MyHomePage> {
     getTodosfromDb();
   }
 
+  Widget exitApp() {
+    if (todoList.length > 0) {
+      return WillPopScope(
+        onWillPop: _onBackPressed,
+        child: new Scaffold(),
+      );
+    }
+    return Text('');
+  }
+
+  Future<bool> _onBackPressed() {
+    return showDialog(
+      context: context,
+      builder: (context) => new AlertDialog(
+        title: new Text('Are you sure?'),
+        content: new Text('Do you want to exit an App'),
+        actions: <Widget>[
+          new GestureDetector(
+            onTap: () => Navigator.of(context).pop(false),
+            child: Text("NO"),
+          ),
+          SizedBox(height: 16),
+          new GestureDetector(
+            onTap: () => Navigator.of(context).pop(true),
+            child: Text("YES"),
+          ),
+        ],
+      ),
+    ).then((value) => value ?? false);
+  }
+
   Widget _buildWelcome() {
-    // Widget tipinde bir metot
+    // Eğer listede görev yoksa bir karşılama ekranı gösterecek
     if (todoList.length == 0) {
       return new Container(
-        constraints: BoxConstraints(minWidth: 100, maxWidth: 400),
-        height: 400,
+        constraints: BoxConstraints(
+            minWidth: 100, maxWidth: 330, minHeight: 100, maxHeight: 400),
         margin: const EdgeInsets.only(top: 50.0),
         decoration: BoxDecoration(
           color: Colors.blue[100],
@@ -110,6 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               Image.asset(
                 'assets/splash.png',
+                fit: BoxFit.fitWidth,
                 width: 250,
               ),
               Text(
@@ -157,110 +189,113 @@ class _MyHomePageState extends State<MyHomePage> {
           }),
       body: Column(
         children: <Widget>[
-          if (todoList.length == 0)
-            _buildWelcome(), // Listede görev yoksa karşılama kutusunu gösteriyor
-          Flexible(
-            child: !isLoading
-                ? ListView.builder(
-                    itemCount: todoList.length,
-                    // itemCount: null,
-                    itemBuilder: (context, index) {
-                      Map<String, dynamic> item = todoList[index];
-                      return new ListTile(
-                        title: Padding(
-                          padding: EdgeInsets.only(bottom: 6.0),
-                          child: Text(item['title']),
-                        ),
-                        onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => new EditTodo(item))),
-                        isThreeLine: true,
-                        subtitle: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  top: 4.0, right: 3.0, bottom: 4.0),
-                              child: Badge(
-                                  animationType: BadgeAnimationType.slide,
-                                  animationDuration:
-                                      Duration(milliseconds: 650),
-                                  badgeContent: Text(
-                                    item['date'].toString().split(' ')[0] +
-                                        " " +
-                                        item['date']
-                                            .toString()
-                                            .split(' ')[1]
-                                            .split(":")[0] +
-                                        ":" +
-                                        item['date']
-                                            .toString()
-                                            .split(' ')[1]
-                                            .split(":")[1],
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  badgeColor: Theme.of(context).primaryColor,
-                                  shape: BadgeShape.square,
-                                  borderRadius: BorderRadius.circular(8)),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 0),
-                              child: item['priority'].isEmpty
-                                  ? null
-                                  : Badge(
-                                      animationType: BadgeAnimationType.slide,
-                                      animationDuration:
-                                          Duration(milliseconds: 650),
-                                      badgeContent: Text(
-                                        item['priority'],
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                      badgeColor: (() {
-                                        switch (item['priority']) {
-                                          case 'Medium':
-                                            return Colors.indigoAccent;
-                                          case 'High':
-                                            return Colors.red;
-
-                                          default:
-                                            return Colors.green;
-                                        }
-                                      }()),
-                                      shape: BadgeShape.square,
-                                      borderRadius: BorderRadius.circular(8)),
-                            )
-                          ],
-                        ),
-                        leading: IconButton(
-                          padding: EdgeInsets.only(bottom: 10),
-                          icon: Icon(
-                            item['status'] == 1 ? Icons.done : Icons.update,
-                            color: item['status'] == 1
-                                ? Colors.green
-                                : Colors.yellow[900],
-                            size: 40.0,
+          _buildWelcome(),
+          WillPopScope(
+            // WillPopScope: Geri düğmesini kontrol eden widget
+            onWillPop: _onBackPressed,
+            child: Flexible(
+              child: !isLoading
+                  ? ListView.builder(
+                      itemCount: todoList.length,
+                      // itemCount: null,
+                      itemBuilder: (context, index) {
+                        Map<String, dynamic> item = todoList[index];
+                        return new ListTile(
+                          title: Padding(
+                            padding: EdgeInsets.only(bottom: 6.0),
+                            child: Text(item['title']),
                           ),
-                          onPressed: () => changeTodo(item),
-                        ),
-                        trailing: Checkbox(
-                          value: selectedItems[index] == null ? false : true,
-                          onChanged: (value) {
-                            setState(() {
-                              if (selectedItems[index] == null) {
-                                selectedItems[index] = item['id'];
-                              } else {
-                                selectedItems.remove(index);
-                              }
-                            });
-                          },
-                        ),
-                      );
-                    },
-                  )
-                : Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                          onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => new EditTodo(item))),
+                          isThreeLine: true,
+                          subtitle: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    top: 4.0, right: 3.0, bottom: 4.0),
+                                child: Badge(
+                                    animationType: BadgeAnimationType.slide,
+                                    animationDuration:
+                                        Duration(milliseconds: 650),
+                                    badgeContent: Text(
+                                      item['date'].toString().split(' ')[0] +
+                                          " " +
+                                          item['date']
+                                              .toString()
+                                              .split(' ')[1]
+                                              .split(":")[0] +
+                                          ":" +
+                                          item['date']
+                                              .toString()
+                                              .split(' ')[1]
+                                              .split(":")[1],
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    badgeColor: Theme.of(context).primaryColor,
+                                    shape: BadgeShape.square,
+                                    borderRadius: BorderRadius.circular(8)),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(top: 0),
+                                child: item['priority'].isEmpty
+                                    ? null
+                                    : Badge(
+                                        animationType: BadgeAnimationType.slide,
+                                        animationDuration:
+                                            Duration(milliseconds: 650),
+                                        badgeContent: Text(
+                                          item['priority'],
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        badgeColor: (() {
+                                          switch (item['priority']) {
+                                            case 'Medium':
+                                              return Colors.indigoAccent;
+                                            case 'High':
+                                              return Colors.red;
+
+                                            default:
+                                              return Colors.green;
+                                          }
+                                        }()),
+                                        shape: BadgeShape.square,
+                                        borderRadius: BorderRadius.circular(8)),
+                              )
+                            ],
+                          ),
+                          leading: IconButton(
+                            padding: EdgeInsets.only(bottom: 10),
+                            icon: Icon(
+                              item['status'] == 1 ? Icons.done : Icons.update,
+                              color: item['status'] == 1
+                                  ? Colors.green
+                                  : Colors.yellow[900],
+                              size: 40.0,
+                            ),
+                            onPressed: () => changeTodo(item),
+                          ),
+                          trailing: Checkbox(
+                            value: selectedItems[index] == null ? false : true,
+                            onChanged: (value) {
+                              setState(() {
+                                if (selectedItems[index] == null) {
+                                  selectedItems[index] = item['id'];
+                                } else {
+                                  selectedItems.remove(index);
+                                }
+                              });
+                            },
+                          ),
+                        );
+                      },
+                    )
+                  : Center(
+                      child: CircularProgressIndicator(),
+                    ),
+            ),
           ),
         ],
       ),
