@@ -94,11 +94,22 @@ class _AddTodoState extends State<AddTodo> {
         leading: Transform.translate(
           offset: Offset(25, 10),
           child: IconButton(
-            onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MyHomePage(),
-                )).then((value) => setState(() {})),
+            onPressed: () => Navigator.of(context)
+                .pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => MyHomePage()),
+                    (Route<dynamic> route) => false)
+                .then((value) => setState(() {})),
+
+            // onPressed: () {
+            //   Navigator.pop(context,
+            //       MaterialPageRoute(builder: (context) => MyHomePage()));
+            //   setState(() {});
+            // },
+            // onPressed: () => Navigator.push(
+            //     context,
+            //     MaterialPageRoute(
+            //       builder: (context) => MyHomePage(),
+            //     )).then((value) => setState(() {})),
             icon: Icon(
               Icons.arrow_back_ios,
               size: 30.0,
@@ -235,13 +246,29 @@ class _AddTodoState extends State<AddTodo> {
                         padding:
                             EdgeInsets.symmetric(horizontal: 0, vertical: 15.0),
                         child: MaterialButton(
-                          onPressed: () => sendForm()
-                              .then((value) => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => MyHomePage(),
-                                  )))
-                              .then((value) => setState(() {})),
+                          onPressed: () {
+                            sendForm();
+                            Navigator.of(context)
+                                .pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                        builder: (context) => MyHomePage()),
+                                    (Route<dynamic> route) => false)
+                                .then((value) => setState(() {}));
+                          },
+                          // onPressed: () => sendForm()
+                          //     .then((value) => Navigator.pushReplacement(
+                          //         context,
+                          //         MaterialPageRoute(
+                          //           builder: (context) => MyHomePage(),
+                          //         )))
+                          //     .then((value) => setState(() {})),
+                          // onPressed: () {
+                          //   sendForm();
+                          //   Navigator.of(context).pushAndRemoveUntil(
+                          //       MaterialPageRoute(
+                          //           builder: (context) => MyHomePage()),
+                          //       (Route<dynamic> route) => false);
+                          // },
                           minWidth: double.infinity,
                           height: 55.0,
                           color: Colors.red,

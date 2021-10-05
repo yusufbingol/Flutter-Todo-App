@@ -186,118 +186,133 @@ class _MyHomePageState extends State<MyHomePage> {
               Navigator.push(
                   context, MaterialPageRoute(builder: (_) => AddTodo()));
             }
+            setState(() {});
           }),
-      body: Column(
-        children: <Widget>[
-          _buildWelcome(),
-          WillPopScope(
-            // WillPopScope: Geri düğmesini kontrol eden widget
-            onWillPop: _onBackPressed,
-            child: Flexible(
-              child: !isLoading
-                  ? ListView.builder(
-                      itemCount: todoList.length,
-                      // itemCount: null,
-                      itemBuilder: (context, index) {
-                        Map<String, dynamic> item = todoList[index];
-                        return new ListTile(
-                          title: Padding(
-                            padding: EdgeInsets.only(bottom: 6.0),
-                            child: Text(item['title']),
-                          ),
-                          onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => new EditTodo(item))),
-                          isThreeLine: true,
-                          subtitle: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.only(
-                                    top: 4.0, right: 3.0, bottom: 4.0),
-                                child: Badge(
-                                    animationType: BadgeAnimationType.slide,
-                                    animationDuration:
-                                        Duration(milliseconds: 650),
-                                    badgeContent: Text(
-                                      item['date'].toString().split(' ')[0] +
-                                          " " +
-                                          item['date']
-                                              .toString()
-                                              .split(' ')[1]
-                                              .split(":")[0] +
-                                          ":" +
-                                          item['date']
-                                              .toString()
-                                              .split(' ')[1]
-                                              .split(":")[1],
-                                      style: TextStyle(color: Colors.white),
+      body: WillPopScope(
+        onWillPop: _onBackPressed,
+        child: todoList.length == 0
+            ? _buildWelcome()
+            : Column(
+                children: <Widget>[
+                  // _buildWelcome(),
+                  Flexible(
+                    child: !isLoading
+                        ? ListView.builder(
+                            itemCount: todoList.length,
+                            // itemCount: null,
+                            itemBuilder: (context, index) {
+                              Map<String, dynamic> item = todoList[index];
+                              return new ListTile(
+                                title: Padding(
+                                  padding: EdgeInsets.only(bottom: 6.0),
+                                  child: Text(item['title']),
+                                ),
+                                onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => new EditTodo(item))),
+                                isThreeLine: true,
+                                subtitle: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          top: 4.0, right: 3.0, bottom: 4.0),
+                                      child: Badge(
+                                          animationType:
+                                              BadgeAnimationType.slide,
+                                          animationDuration:
+                                              Duration(milliseconds: 650),
+                                          badgeContent: Text(
+                                            item['date']
+                                                    .toString()
+                                                    .split(' ')[0] +
+                                                " " +
+                                                item['date']
+                                                    .toString()
+                                                    .split(' ')[1]
+                                                    .split(":")[0] +
+                                                ":" +
+                                                item['date']
+                                                    .toString()
+                                                    .split(' ')[1]
+                                                    .split(":")[1],
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                          badgeColor:
+                                              Theme.of(context).primaryColor,
+                                          shape: BadgeShape.square,
+                                          borderRadius:
+                                              BorderRadius.circular(8)),
                                     ),
-                                    badgeColor: Theme.of(context).primaryColor,
-                                    shape: BadgeShape.square,
-                                    borderRadius: BorderRadius.circular(8)),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 0),
-                                child: item['priority'].isEmpty
-                                    ? null
-                                    : Badge(
-                                        animationType: BadgeAnimationType.slide,
-                                        animationDuration:
-                                            Duration(milliseconds: 650),
-                                        badgeContent: Text(
-                                          item['priority'],
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        badgeColor: (() {
-                                          switch (item['priority']) {
-                                            case 'Medium':
-                                              return Colors.indigoAccent;
-                                            case 'High':
-                                              return Colors.red;
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 0),
+                                      child: item['priority'].isEmpty
+                                          ? null
+                                          : Badge(
+                                              animationType:
+                                                  BadgeAnimationType.slide,
+                                              animationDuration:
+                                                  Duration(milliseconds: 650),
+                                              badgeContent: Text(
+                                                item['priority'],
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                              badgeColor: (() {
+                                                switch (item['priority']) {
+                                                  case 'Medium':
+                                                    return Colors.indigoAccent;
+                                                  case 'High':
+                                                    return Colors.red;
 
-                                            default:
-                                              return Colors.green;
-                                          }
-                                        }()),
-                                        shape: BadgeShape.square,
-                                        borderRadius: BorderRadius.circular(8)),
-                              )
-                            ],
-                          ),
-                          leading: IconButton(
-                            padding: EdgeInsets.only(bottom: 10),
-                            icon: Icon(
-                              item['status'] == 1 ? Icons.done : Icons.update,
-                              color: item['status'] == 1
-                                  ? Colors.green
-                                  : Colors.yellow[900],
-                              size: 40.0,
-                            ),
-                            onPressed: () => changeTodo(item),
-                          ),
-                          trailing: Checkbox(
-                            value: selectedItems[index] == null ? false : true,
-                            onChanged: (value) {
-                              setState(() {
-                                if (selectedItems[index] == null) {
-                                  selectedItems[index] = item['id'];
-                                } else {
-                                  selectedItems.remove(index);
-                                }
-                              });
+                                                  default:
+                                                    return Colors.green;
+                                                }
+                                              }()),
+                                              shape: BadgeShape.square,
+                                              borderRadius:
+                                                  BorderRadius.circular(8)),
+                                    )
+                                  ],
+                                ),
+                                leading: IconButton(
+                                  padding: EdgeInsets.only(bottom: 10),
+                                  icon: Icon(
+                                    item['status'] == 1
+                                        ? Icons.done
+                                        : Icons.update,
+                                    color: item['status'] == 1
+                                        ? Colors.green
+                                        : Colors.yellow[900],
+                                    size: 40.0,
+                                  ),
+                                  onPressed: () => changeTodo(item),
+                                ),
+                                trailing: Checkbox(
+                                  value: selectedItems[index] == null
+                                      ? false
+                                      : true,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      if (selectedItems[index] == null) {
+                                        selectedItems[index] = item['id'];
+                                      } else {
+                                        selectedItems.remove(index);
+                                      }
+                                    });
+                                  },
+                                ),
+                              );
                             },
+                          )
+                        : Center(
+                            child: CircularProgressIndicator(),
                           ),
-                        );
-                      },
-                    )
-                  : Center(
-                      child: CircularProgressIndicator(),
-                    ),
-            ),
-          ),
-        ],
+                  ),
+                ],
+              ),
       ),
     );
   }
