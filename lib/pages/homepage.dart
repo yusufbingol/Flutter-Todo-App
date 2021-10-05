@@ -126,11 +126,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildWelcome() {
     // Eğer listede görev yoksa bir karşılama ekranı gösterecek
-    if (todoList.length == 0) {
-      return new Container(
+
+    return Center(
+      child: new Container(
         constraints: BoxConstraints(
             minWidth: 100, maxWidth: 330, minHeight: 100, maxHeight: 400),
-        margin: const EdgeInsets.only(top: 50.0),
+        margin: const EdgeInsets.only(top: 8.0),
         decoration: BoxDecoration(
           color: Colors.blue[100],
           borderRadius: BorderRadius.circular(30),
@@ -159,9 +160,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
         ),
-      );
-    }
-    return new Text('');
+      ),
+    );
   }
 
   Widget build(BuildContext context) {
