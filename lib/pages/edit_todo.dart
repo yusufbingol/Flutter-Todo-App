@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_app/Helpers/database_helper.dart';
@@ -27,7 +28,12 @@ class _AddTodoState extends State<EditTodo> {
   TextEditingController titleController = TextEditingController();
 
   final DateFormat _dateFormat = DateFormat('dd MMM, yyy').add_Hm();
-  final List<String> _priorities = ['Low', 'Medium', 'High'];
+  final List<String> _priorities = [
+    'Low',
+    'Medium',
+    'High',
+    ''
+  ]; // Öncelik seçilmemişte edit yapmıyordu. Null string ekledim ve düzeldi.
 
   _handleDatePicker() async {
     final date = await showDatePicker(
@@ -216,7 +222,7 @@ class _AddTodoState extends State<EditTodo> {
                           dropdownColor: Colors.black,
                           value: selectedPriority,
                           items: _priorities.map((String priority) {
-                            return DropdownMenuItem(
+                            return DropdownMenuItem<String>(
                               value: priority,
                               child: Text(
                                 priority,
